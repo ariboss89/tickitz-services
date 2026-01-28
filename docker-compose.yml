@@ -1,0 +1,44 @@
+services:
+  tickitz-services:
+    image: tickitz-services
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ts
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+      - postgres
+    env_file:
+      - .env
+    networks:
+      - ticksbe
+
+  redis:
+    image: redis:8.4
+    container_name: myrdb
+    networks:
+      - ticksbe
+    volumes:
+      - redis:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: /usr/local/etc/redis/redis.conf
+
+  postgres:
+    image: postgres:18
+    container_name: db
+    env_file: .env.local
+    networks:
+      - ticksbe
+    volumes:
+      - postgres18_data:/var/lib/postgresql/18/docker
+
+networks:
+  ticksbe:
+
+volumes:
+  postgres18_data:
+    external: true
+  redis:
+    external: true

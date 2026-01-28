@@ -1,0 +1,6 @@
+.env.production
+.env.staging
+.env
+.sql
+
+tmp

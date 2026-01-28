@@ -1,0 +1,866 @@
+basePath: /
+definitions:
+  dto.Actors:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  dto.CreateOrder:
+    properties:
+      payment_id:
+        type: integer
+      schedule_id:
+        description: Id           string  `json:"order_id,omitempty"`
+        type: integer
+      seat_id:
+        items:
+          type: integer
+        type: array
+      sub_total:
+        type: number
+      tax:
+        type: number
+      total_price:
+        type: number
+      total_ticket:
+        type: integer
+    type: object
+  dto.Genres:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  dto.History:
+    properties:
+      booking_code:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      movie_title:
+        type: string
+      order_id:
+        type: string
+      payment_method:
+        type: string
+      phone:
+        type: string
+      seat_number:
+        type: string
+      show_date:
+        type: string
+      show_time:
+        type: string
+      status:
+        type: string
+      total_price:
+        type: string
+    type: object
+  dto.Login:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.LoginResponse:
+    properties:
+      email:
+        type: string
+      role:
+        type: string
+      token:
+        type: string
+    type: object
+  dto.LogoutResponse:
+    properties:
+      msg:
+        type: string
+    type: object
+  dto.MovieDetails:
+    properties:
+      actor_name:
+        type: string
+      background_url:
+        type: string
+      director_name:
+        type: string
+      duration:
+        type: integer
+      genres_name:
+        type: string
+      id_movie:
+        type: integer
+      poster_url:
+        type: string
+      release_date:
+        type: string
+      synopsis:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.MovieGenres:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.Movies:
+    properties:
+      Id:
+        type: integer
+      background_url:
+        type: string
+      duration:
+        type: integer
+      poster_url:
+        type: string
+      rating:
+        type: number
+      release_date:
+        type: string
+      status:
+        type: string
+      synopsis:
+        type: string
+      title:
+        type: string
+    required:
+    - Id
+    type: object
+  dto.NewUser:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.PaginationMeta:
+    properties:
+      next_page:
+        type: string
+      page:
+        type: integer
+      prev_page:
+        type: string
+      total_page:
+        type: integer
+    type: object
+  dto.RegisterResponse:
+    properties:
+      email:
+        type: string
+    type: object
+  dto.Response:
+    properties:
+      data:
+        items: {}
+        type: array
+      error:
+        type: string
+      meta:
+        $ref: '#/definitions/dto.PaginationMeta'
+      msg:
+        type: string
+      success:
+        type: boolean
+    type: object
+  dto.ResponseError:
+    properties:
+      error:
+        type: string
+      msg:
+        type: string
+      success:
+        type: boolean
+    type: object
+  dto.Schedules:
+    properties:
+      cinema_address:
+        type: string
+      cinema_city:
+        type: string
+      cinema_name:
+        type: string
+      movie_id:
+        type: integer
+      movie_name:
+        type: string
+      price:
+        type: integer
+      show_date:
+        type: string
+      show_time:
+        type: string
+      studio_name:
+        type: string
+    required:
+    - cinema_address
+    - cinema_city
+    - cinema_name
+    - movie_id
+    - movie_name
+    - price
+    - show_date
+    - show_time
+    - studio_name
+    type: object
+  dto.SearchMovies:
+    properties:
+      genre_name:
+        type: string
+      id:
+        type: integer
+      poster_url:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.UpdateMovies:
+    properties:
+      background_url:
+        type: string
+      duration:
+        type: integer
+      poster_url:
+        type: string
+      rating:
+        type: number
+      release_date:
+        type: string
+      status:
+        type: string
+      synopsis:
+        type: string
+      title:
+        type: string
+    type: object
+  dto.UpdatePassword:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+    type: object
+  dto.Users:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      image:
+        type: string
+      last_name:
+        type: string
+      phone:
+        type: string
+    type: object
+host: localhost:8002
+info:
+  contact: {}
+  description: Backend Services For Tickitz Project
+  title: Tickitz Services
+  version: "1.0"
+paths:
+  /actors/:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Actors'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      summary: Get All Actors
+      tags:
+      - actor
+  /admin/movies/:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Movies'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Show All Movies For Admin
+      tags:
+      - admin
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Title
+        in: formData
+        name: title
+        type: string
+      - description: Synopsis
+        in: formData
+        name: synopsis
+        type: string
+      - description: Poster Photo
+        in: formData
+        name: poster_file
+        type: file
+      - description: Background Photo
+        in: formData
+        name: background_file
+        type: file
+      - description: Release Date
+        in: formData
+        name: release_date
+        type: string
+      - description: Duration Movie
+        in: formData
+        name: duration
+        type: integer
+      - description: Status(upcoming or now_showing)
+        in: formData
+        name: status
+        type: string
+      - description: Rating
+        in: formData
+        name: rating
+        type: number
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Post Movies
+      tags:
+      - admin
+  /admin/movies/delete/{id}:
+    delete:
+      parameters:
+      - description: Movie Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UpdateMovies'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Delete Movies For Admin
+      tags:
+      - admin
+  /admin/movies/update/{id}:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Movie Id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update Movies Body
+        in: body
+        name: movies
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateMovies'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UpdateMovies'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Update Movies For Admin
+      tags:
+      - admin
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User Login Body
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      summary: Login new user
+      tags:
+      - auth
+  /auth/logout:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.LogoutResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Logout user
+      tags:
+      - auth
+  /auth/password:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: User Update Body
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdatePassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UpdatePassword'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Change Password
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User Registration Body
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/dto.NewUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.RegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      summary: Register new user
+      tags:
+      - auth
+  /genres/:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Genres'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      summary: Get All Genres
+      tags:
+      - genre
+  /movies/:
+    get:
+      parameters:
+      - description: Status Movies (popular, upcoming or now_showing)
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Movies'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      summary: Get Movies By Status
+      tags:
+      - movies
+  /movies/{id}:
+    get:
+      parameters:
+      - description: Id Movie
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MovieDetails'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      summary: Get Movies Detail By Id
+      tags:
+      - movies
+  /movies/genres/{id}:
+    get:
+      parameters:
+      - description: Id Movie
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MovieGenres'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      summary: Get Movie Genres By Id
+      tags:
+      - movies
+  /movies/search:
+    get:
+      parameters:
+      - description: Movie Title
+        in: query
+        name: title
+        type: string
+      - collectionFormat: multi
+        description: Genres
+        in: query
+        items:
+          type: string
+        name: genre
+        type: array
+      - description: Page
+        in: query
+        name: page
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.SearchMovies'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      summary: Search Movies
+      tags:
+      - movies
+  /order/:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Create Order Body
+        in: body
+        name: auth
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateOrder'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.CreateOrder'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Create Order
+      tags:
+      - order
+  /order/schedule:
+    get:
+      parameters:
+      - description: Movie Date
+        in: query
+        name: date
+        required: true
+        type: string
+      - description: Movie Time
+        in: query
+        name: time
+        required: true
+        type: string
+      - description: Cinema City
+        in: query
+        name: location
+        required: true
+        type: string
+      - description: Movie Id
+        in: query
+        name: movie_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Schedules'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Get Schedules
+      tags:
+      - order
+  /user/:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: First Name
+        in: formData
+        name: first_name
+        type: string
+      - description: Last Name
+        in: formData
+        name: last_name
+        type: string
+      - description: Update Profile Body
+        in: formData
+        name: image
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.MovieGenres'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Update Profile
+      tags:
+      - user
+  /user/history:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.History'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Get User History
+      tags:
+      - user
+  /user/profile:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Users'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Get User Profiles By Email
+      tags:
+      - user
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by space and JWT Token
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
