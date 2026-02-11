@@ -1,22 +1,20 @@
-name: Tickitz GHCR
+name: Building Image And Push To GHCR
+
 on:
   push:
     branches:
-      - main
-
-permissions:
-  contents: read
-  packages: write
+      - master
 
 jobs:
-  Build-And-Publish:
+  build-and-publish:
     runs-on: ubuntu-latest
+
     steps:
-      - name: checkout code
-        uses: actions/checkout@v5
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Build and push to GHCR
         uses: macbre/push-to-ghcr@master
         with:
-          image_name: ${{ github.repository }} # it will be lowercased internally
+          image_name: ${{ github.repository }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
