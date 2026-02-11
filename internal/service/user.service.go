@@ -40,6 +40,18 @@ func (u UserService) GetUserProfileByEmail(ctx context.Context, email string) ([
 	return response, nil
 }
 
+func (u UserService) UpdateProfile(ctx context.Context, update dto.UpdateProfile, email string) error {
+	cmd, err := u.userRepository.UpdateProfile(ctx, update, email)
+	if err != nil {
+		return nil
+	}
+	if cmd.RowsAffected() == 0 {
+		return errors.New("no data updated")
+	}
+	// invalidasi cache
+	return nil
+}
+
 func (u UserService) GetHistory(ctx context.Context, id int) ([]dto.History, error) {
 	data, err := u.userRepository.GetHistory(ctx, id)
 	if err != nil {
@@ -63,18 +75,6 @@ func (u UserService) GetHistory(ctx context.Context, id int) ([]dto.History, err
 		})
 	}
 	return response, nil
-}
-
-func (u UserService) UpdateProfile(ctx context.Context, update dto.UpdateProfile, email string) error {
-	cmd, err := u.userRepository.UpdateProfile(ctx, update, email)
-	if err != nil {
-		return nil
-	}
-	if cmd.RowsAffected() == 0 {
-		return errors.New("no data updated")
-	}
-	// invalidasi cache
-	return nil
 }
 
 // func (u UserService) UpdatePassword(ctx context.Context, update dto.UpdatePassword) (dto.UpdatePassword, error) {

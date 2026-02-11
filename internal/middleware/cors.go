@@ -12,7 +12,7 @@ import (
 func CORSMiddleware(c *gin.Context) {
 	defer c.Next()
 	// Allowed Origin
-	whiteListOrigin := []string{"http://127.0.0.1:8001", "http://localhost:8001", "http://127.0.0.1:6380", "http://localhost:5173", "http://localhost:8002", "http://127.0.0.1:8002"}
+	whiteListOrigin := []string{"http://127.0.0.1:8001", "http://localhost:8001", "http://127.0.0.1:6380", "http://localhost:5173", "http://localhost:8002", "http://127.0.0.1:8002", "http://localhost:8003", "http://127.0.0.1:8003"}
 	origin := c.GetHeader("Origin")
 	if slices.Contains(whiteListOrigin, origin) {
 		c.Header("Access-Control-Allow-Origin", origin)

@@ -187,3 +187,11 @@ func (a AdminRepository) PostMovies(ctx context.Context, post dto.PostMovies) (p
 
 	return a.db.Exec(ctx, sqlStr, values...)
 }
+
+func (a AdminRepository) UpdateStatusByOrderId(ctx context.Context, db DBTX, updt dto.UpdateStatusOrder) (pgconn.CommandTag, error) {
+	sqlStr := `
+			UPDATE orders SET status = $1 WHERE id = $2
+			`
+	values := []any{strings.ToLower(updt.Status), updt.OrderId}
+	return db.Exec(ctx, sqlStr, values...)
+}

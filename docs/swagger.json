@@ -6,11 +6,16 @@
         "contact": {},
         "version": "1.0"
     },
-    "host": "localhost:8002",
+    "host": "72.62.120.77:8081",
     "basePath": "/",
     "paths": {
-        "/actors/": {
+        "/actors": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -34,7 +39,7 @@
                 }
             }
         },
-        "/admin/movies/": {
+        "/admin/movies": {
             "get": {
                 "security": [
                     {
@@ -265,6 +270,74 @@
                 }
             }
         },
+        "/admin/orders": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Update status",
+                "parameters": [
+                    {
+                        "description": "Update status order [pending, done, cancelled]",
+                        "name": "orders",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateStatusOrder"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ResponseError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ResponseError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ResponseError"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ResponseError"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "consumes": [
@@ -453,7 +526,7 @@
                 }
             }
         },
-        "/genres/": {
+        "/genres": {
             "get": {
                 "produces": [
                     "application/json"
@@ -478,7 +551,7 @@
                 }
             }
         },
-        "/movies/": {
+        "/movies": {
             "get": {
                 "produces": [
                     "application/json"
@@ -647,7 +720,7 @@
                 }
             }
         },
-        "/order/": {
+        "/order": {
             "post": {
                 "security": [
                     {
@@ -769,7 +842,7 @@
                 }
             }
         },
-        "/user/": {
+        "/user": {
             "patch": {
                 "security": [
                     {
@@ -1305,6 +1378,21 @@
                     "type": "string"
                 },
                 "old_password": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UpdateStatusOrder": {
+            "type": "object",
+            "required": [
+                "order_id",
+                "status"
+            ],
+            "properties": {
+                "order_id": {
+                    "type": "string"
+                },
+                "status": {
                     "type": "string"
                 }
             }

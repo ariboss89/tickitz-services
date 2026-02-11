@@ -22,5 +22,4 @@ func RegisterOrderRouter(app *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
 
 	orderRouter.GET("/schedule", middleware.AuthRole("user"), orderController.GetSchedules)
 	orderRouter.POST("/", middleware.AuthRole("user"), orderController.CreateOrder)
-
 }

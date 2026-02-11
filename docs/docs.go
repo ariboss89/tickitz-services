@@ -15,8 +15,13 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/actors/": {
+        "/actors": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -40,7 +45,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/movies/": {
+        "/admin/movies": {
             "get": {
                 "security": [
                     {
@@ -271,6 +276,74 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/orders": {
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Update status",
+                "parameters": [
+                    {
+                        "description": "Update status order [pending, done, cancelled]",
+                        "name": "orders",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateStatusOrder"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ResponseError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ResponseError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ResponseError"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ResponseError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ResponseError"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login": {
             "post": {
                 "consumes": [
@@ -459,7 +532,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/genres/": {
+        "/genres": {
             "get": {
                 "produces": [
                     "application/json"
@@ -484,7 +557,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/movies/": {
+        "/movies": {
             "get": {
                 "produces": [
                     "application/json"
@@ -653,7 +726,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/order/": {
+        "/order": {
             "post": {
                 "security": [
                     {
@@ -775,7 +848,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/": {
+        "/user": {
             "patch": {
                 "security": [
                     {
@@ -1315,6 +1388,21 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.UpdateStatusOrder": {
+            "type": "object",
+            "required": [
+                "order_id",
+                "status"
+            ],
+            "properties": {
+                "order_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.Users": {
             "type": "object",
             "properties": {
@@ -1352,7 +1440,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8002",
+	Host:             "72.62.120.77:8081",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Tickitz Services",

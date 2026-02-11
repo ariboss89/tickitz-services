@@ -13,7 +13,7 @@ import (
 func RegisterAdminRouter(app *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
 	adminRouter := app.Group("/admin")
 	adminRepository := repository.NewAdminRepository(db)
-	adminService := service.NewAdminService(adminRepository)
+	adminService := service.NewAdminService(adminRepository, db)
 	adminController := controller.NewAdminController(adminService)
 	adminRouter.Use(middleware.VerifyJWT)
 	adminRouter.Use(middleware.IsBlackListed(rdb))
@@ -22,4 +22,5 @@ func RegisterAdminRouter(app *gin.Engine, db *pgxpool.Pool, rdb *redis.Client) {
 	adminRouter.POST("/movies", middleware.AuthRole("admin"), adminController.PostMovie)
 	adminRouter.PATCH("/movies/update/:id", middleware.AuthRole("admin"), adminController.UpdateMovie)
 	adminRouter.PATCH("/movies/delete/:id", middleware.AuthRole("admin"), adminController.DeleteMovie)
+	adminRouter.PATCH("/orders", middleware.AuthRole("admin"), adminController.UpdateStatusOrder)
 }

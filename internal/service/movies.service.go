@@ -2,8 +2,12 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"log"
+	"math"
 	"strings"
+	"time"
 
 	"github.com/ariboss89/tickitz-services/internal/dto"
 	"github.com/ariboss89/tickitz-services/internal/repository"
@@ -143,6 +147,30 @@ func (m MovieService) GetMovieDetailById(ctx context.Context, id int) ([]dto.Mov
 }
 
 func (m MovieService) SearchMoviesByTitleAndGenre(ctx context.Context, title string, genre []string, page int) ([]dto.SearchMovies, error) {
+	var genres string
+	for i := range genre {
+		genres += genre[i]
+	}
+	rkey := "ari:tickitz:searchmovies" + title + genres
+	rsc := m.redis.Get(ctx, rkey)
+	if rsc.Err() == nil {
+		var result []dto.SearchMovies
+		cache, err := rsc.Bytes()
+		if err != nil {
+			log.Println(err)
+		} else {
+			if err := json.Unmarshal(cache, &result); err != nil {
+				log.Println(err.Error())
+			} else {
+				return result, nil
+			}
+		}
+	}
+
+	if rsc.Err() == redis.Nil {
+		log.Println("movies cache miss")
+	}
+
 	data, err := m.movieRepository.SearchMoviesByTitleAndGenre(ctx, title, genre, page)
 	if err != nil {
 		return nil, err
@@ -156,5 +184,30 @@ func (m MovieService) SearchMoviesByTitleAndGenre(ctx context.Context, title str
 			Genre:      v.Genre,
 		})
 	}
+
+	cacheStr, err := json.Marshal(response)
+	if err != nil {
+		log.Println(err)
+		log.Println("failed to marshal")
+	}
+
+	rdsStatus := m.redis.Set(ctx, rkey, string(cacheStr), time.Minute*10)
+	if rdsStatus.Err() != nil {
+		log.Println("caching failed")
+		log.Println(rdsStatus.Err().Error())
+	}
+
 	return response, nil
+}
+
+func (m MovieService) GetTotalPage(ctx context.Context) (int, error) {
+	totalData, err := m.movieRepository.GetTotalPage(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	div := float64(totalData) / float64(5)
+	totPage := int(math.Ceil(div))
+
+	return totPage, nil
 }

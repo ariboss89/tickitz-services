@@ -4,3 +4,8 @@
 .sql
 
 tmp
+Dockerfile
+*.sql
+*.conf
+*.yaml
+*.yml

@@ -1,44 +1,49 @@
 services:
-  tickitz-services:
-    image: tickitz-services
+  backend:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: ts
+    container_name: tick-services
     ports:
-      - "8080:8080"
+      - "8081:8080"
     depends_on:
       - redis
       - postgres
     env_file:
       - .env
     networks:
-      - ticksbe
+      - tickitz-net
 
   redis:
     image: redis:8.4
-    container_name: myrdb
+    container_name: myrds
     networks:
-      - ticksbe
+      - tickitz-net
     volumes:
       - redis:/data
-      - ./redis.conf:/usr/local/etc/redis/redis.conf
-    command: /usr/local/etc/redis/redis.conf
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server --requirepass ${RDS_PASS}
 
   postgres:
-    image: postgres:18
-    container_name: db
+    image: postgres:17.7-alpine3.23
+    container_name: dbsb
     env_file: .env.local
     networks:
-      - ticksbe
+      - tickitz-net
     volumes:
-      - postgres18_data:/var/lib/postgresql/18/docker
+      - pg-data:/var/lib/postgresql/data
 
+  nginx:
+    image: nginx:mainline-alpine3.23
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/nginx.conf:ro
 networks:
-  ticksbe:
+  tickitz-net:
 
 volumes:
-  postgres18_data:
+  pg-data:
     external: true
   redis:
     external: true

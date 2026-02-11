@@ -47,7 +47,6 @@ func (o OrderService) GetSchedules(ctx context.Context, date, time, location str
 }
 
 func (o OrderService) CreateOrder(ctx context.Context, userId int, createOrder dto.CreateOrder) (dto.OrderResponse, error) {
-
 	//begin trx
 	tx, err := o.db.Begin(ctx)
 	if err != nil {

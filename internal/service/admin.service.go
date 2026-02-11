@@ -3,18 +3,22 @@ package service
 import (
 	"context"
 	"errors"
+	"slices"
 
 	"github.com/ariboss89/tickitz-services/internal/dto"
 	"github.com/ariboss89/tickitz-services/internal/repository"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type AdminService struct {
 	adminRepository *repository.AdminRepository
+	db              *pgxpool.Pool
 }
 
-func NewAdminService(adminRepository *repository.AdminRepository) *AdminService {
+func NewAdminService(adminRepository *repository.AdminRepository, db *pgxpool.Pool) *AdminService {
 	return &AdminService{
 		adminRepository: adminRepository,
+		db:              db,
 	}
 }
 
@@ -75,4 +79,22 @@ func (a AdminService) DeleteMovie(ctx context.Context, id int) (dto.DeleteMovie,
 	}
 
 	return response, nil
+}
+
+func (a AdminService) UpdateStatusByOrderId(ctx context.Context, sts dto.UpdateStatusOrder) error {
+	status := []string{"pending", "done", "cancelled"}
+	isAvailable := slices.Contains(status, sts.Status)
+
+	if !isAvailable {
+		return errors.New("status is not valid")
+	}
+
+	cmd, err := a.adminRepository.UpdateStatusByOrderId(ctx, a.db, sts)
+	if err != nil {
+		return err
+	}
+	if cmd.RowsAffected() == 0 {
+		return errors.New("no data deleted")
+	}
+	return nil
 }

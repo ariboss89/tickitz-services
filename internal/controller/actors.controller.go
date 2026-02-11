@@ -24,7 +24,8 @@ func NewActorController(actorService *service.ActorService) *ActorController {
 // @Produce      json
 // @Success      200  {object}  dto.Actors
 // @Failure 		 500 {object} dto.ResponseError
-// @Router       /actors/ [get]
+// @Router       /actors [get]
+// @security		BearerAuth
 func (m ActorController) GetAllActors(c *gin.Context) {
 	data, err := m.actorService.GetAllActors(c.Request.Context())
 	if err != nil {

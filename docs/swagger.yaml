@@ -257,6 +257,16 @@ definitions:
       old_password:
         type: string
     type: object
+  dto.UpdateStatusOrder:
+    properties:
+      order_id:
+        type: string
+      status:
+        type: string
+    required:
+    - order_id
+    - status
+    type: object
   dto.Users:
     properties:
       email:
@@ -272,14 +282,14 @@ definitions:
       phone:
         type: string
     type: object
-host: localhost:8002
+host: 72.62.120.77:8081
 info:
   contact: {}
   description: Backend Services For Tickitz Project
   title: Tickitz Services
   version: "1.0"
 paths:
-  /actors/:
+  /actors:
     get:
       produces:
       - application/json
@@ -292,10 +302,12 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ResponseError'
+      security:
+      - BearerAuth: []
       summary: Get All Actors
       tags:
       - actor
-  /admin/movies/:
+  /admin/movies:
     get:
       produces:
       - application/json
@@ -441,6 +453,49 @@ paths:
       summary: Update Movies For Admin
       tags:
       - admin
+  /admin/orders:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Update status order [pending, done, cancelled]
+        in: body
+        name: orders
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateStatusOrder'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ResponseError'
+      security:
+      - BearerAuth: []
+      summary: Update status
+      tags:
+      - admin
   /auth/login:
     post:
       consumes:
@@ -560,7 +615,7 @@ paths:
       summary: Register new user
       tags:
       - auth
-  /genres/:
+  /genres:
     get:
       produces:
       - application/json
@@ -576,7 +631,7 @@ paths:
       summary: Get All Genres
       tags:
       - genre
-  /movies/:
+  /movies:
     get:
       parameters:
       - description: Status Movies (popular, upcoming or now_showing)
@@ -686,7 +741,7 @@ paths:
       summary: Search Movies
       tags:
       - movies
-  /order/:
+  /order:
     post:
       consumes:
       - application/json
@@ -764,7 +819,7 @@ paths:
       summary: Get Schedules
       tags:
       - order
-  /user/:
+  /user:
     patch:
       consumes:
       - application/json

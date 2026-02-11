@@ -27,7 +27,7 @@ func NewMovieController(movieService *service.MovieService) *MovieController {
 // @Param        status		query string  false  "Status Movies (popular, upcoming or now_showing)"
 // @Success      200  {object}  dto.Movies
 // @Failure 		 500 {object} dto.ResponseError
-// @Router       /movies/ [get]
+// @Router       /movies [get]
 func (m MovieController) GetMoviesByStatus(c *gin.Context) {
 	status := c.Query("status")
 	var moviesQuery dto.MoviesQuery
@@ -172,13 +172,23 @@ func (m MovieController) SearchMoviesByTitleAndGenre(c *gin.Context) {
 		})
 		return
 	}
+	totalPage, err := m.movieService.GetTotalPage(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ResponseError{
+			Msg:     "Internal Server Error",
+			Success: false,
+			Error:   "internal server error",
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, dto.Response{
 		Msg:     "OK",
 		Success: true,
 		Data:    []any{data},
 		Meta: dto.PaginationMeta{
 			Page:      intPage,
-			TotalPage: intPage,
+			TotalPage: totalPage,
 		},
 	})
 }

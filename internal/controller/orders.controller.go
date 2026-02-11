@@ -78,7 +78,7 @@ func (o OrderController) GetSchedules(c *gin.Context) {
 // @Failure 		 500 {object} dto.ResponseError
 // @Failure			 404 {object} dto.ResponseError
 // @Failure			 400 {object} dto.ResponseError
-// @Router       /order/ [post]
+// @Router       /order [post]
 // @Security			BearerAuth
 func (o OrderController) CreateOrder(c *gin.Context) {
 	// seats := c.QueryArray("seat")

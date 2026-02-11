@@ -182,3 +182,16 @@ func (m MoviesRepository) SearchMoviesByTitleAndGenre(ctx context.Context, title
 
 	return mds, nil
 }
+
+func (m MoviesRepository) GetTotalPage(ctx context.Context) (int, error) {
+	var count int
+	sqlCheck := "SELECT count(title) FROM movies"
+
+	err := m.db.QueryRow(ctx, sqlCheck).Scan(&count)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}

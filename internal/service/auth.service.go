@@ -30,21 +30,15 @@ func (a AuthService) Register(ctx context.Context, newUser dto.NewUser) (dto.Reg
 	if err != nil {
 		return dto.RegisterResponse{}, err
 	}
-
 	newUser.Password = hp
-
 	data, err := a.authRepository.Register(ctx, newUser)
-
 	if err != nil {
 		return dto.RegisterResponse{}, err
 	}
-
 	response := dto.RegisterResponse{
 		Email: data.Email,
 	}
-
 	return response, nil
-
 }
 
 func (a AuthService) Login(ctx context.Context, newUser dto.Login) (dto.LoginResponse, error) {

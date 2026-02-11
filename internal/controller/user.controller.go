@@ -64,43 +64,6 @@ func (u UserController) GetUserProfileByEmail(c *gin.Context) {
 	})
 }
 
-// Get User History
-// @Summary      Get User History
-// @Tags         user
-// @Produce      json
-// @Success      200  {object}  dto.History
-// @Failure 		 403 {object} dto.ResponseError
-// @Failure 		 500 {object} dto.ResponseError
-// @Router       /user/history [get]
-// @security			BearerAuth
-func (u UserController) GetHistory(c *gin.Context) {
-	token, isExist := c.Get("token")
-	if !isExist {
-		c.AbortWithStatusJSON(http.StatusForbidden, dto.Response{
-			Msg:     "Forbidden Access",
-			Success: false,
-			Data:    []any{},
-			Error:   "Access Denied",
-		})
-		return
-	}
-	accessToken, _ := token.(pkg.JWTClaims)
-
-	data, err := u.userService.GetHistory(c.Request.Context(), accessToken.Id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, dto.ResponseError{
-			Msg:     "Internal Server Error",
-			Success: false,
-			Error:   "internal server error",
-		})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"msg":  "OK",
-		"data": data,
-	})
-}
-
 // Update Profile
 // @Summary      Update Profile
 // @Tags         user
@@ -114,21 +77,12 @@ func (u UserController) GetHistory(c *gin.Context) {
 // @Failure 		 403 {object} dto.ResponseError
 // @Failure 		 404 {object} dto.ResponseError
 // @Failure 		 500 {object} dto.ResponseError
-// @Router       /user/ [patch]
+// @Router       /user [patch]
 // @Security			BearerAuth
 func (u UserController) UpdateProfile(c *gin.Context) {
 	const maxSize = 1 * 1024 * 1024
 	var updateUser dto.UpdateProfile
-	token, isExist := c.Get("token")
-	if !isExist {
-		c.AbortWithStatusJSON(http.StatusForbidden, dto.Response{
-			Msg:     "Forbidden Access",
-			Success: false,
-			Data:    []any{},
-			Error:   "Access Denied",
-		})
-		return
-	}
+	token, _ := c.Get("token")
 	accessToken, _ := token.(pkg.JWTClaims)
 
 	if err := c.ShouldBindWith(&updateUser, binding.FormMultipart); err != nil {
@@ -224,4 +178,41 @@ func (u UserController) UpdateProfile(c *gin.Context) {
 		})
 		return
 	}
+}
+
+// Get User History
+// @Summary      Get User History
+// @Tags         user
+// @Produce      json
+// @Success      200  {object}  dto.History
+// @Failure 		 403 {object} dto.ResponseError
+// @Failure 		 500 {object} dto.ResponseError
+// @Router       /user/history [get]
+// @security			BearerAuth
+func (u UserController) GetHistory(c *gin.Context) {
+	token, isExist := c.Get("token")
+	if !isExist {
+		c.AbortWithStatusJSON(http.StatusForbidden, dto.Response{
+			Msg:     "Forbidden Access",
+			Success: false,
+			Data:    []any{},
+			Error:   "Access Denied",
+		})
+		return
+	}
+	accessToken, _ := token.(pkg.JWTClaims)
+
+	data, err := u.userService.GetHistory(c.Request.Context(), accessToken.Id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, dto.ResponseError{
+			Msg:     "Internal Server Error",
+			Success: false,
+			Error:   "internal server error",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"msg":  "OK",
+		"data": data,
+	})
 }

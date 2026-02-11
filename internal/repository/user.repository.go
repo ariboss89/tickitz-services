@@ -45,6 +45,51 @@ func (u UserRepository) GetUserProfileByEmail(ctx context.Context, email string)
 	return users, nil
 }
 
+func (u UserRepository) UpdateProfile(ctx context.Context, update dto.UpdateProfile, email string) (pgconn.CommandTag, error) {
+	var sql strings.Builder
+	values := []any{}
+	//valuesAll := []any{}
+
+	sql.WriteString("UPDATE users SET")
+	if update.First_Name != "" {
+		fmt.Fprintf(&sql, " first_name=$%d", len(values)+1)
+		values = append(values, update.First_Name)
+		//valuesAll = append(valuesAll, &update.First_Name)
+	}
+	if update.Last_Name != "" {
+		if len(values) > 0 {
+			sql.WriteString(",")
+		}
+		fmt.Fprintf(&sql, " last_name=$%d", len(values)+1)
+		values = append(values, update.Last_Name)
+		//valuesAll = append(valuesAll, &update.Last_Name)
+	}
+	if update.ImageName != "" {
+		if len(values) > 0 {
+			sql.WriteString(",")
+		}
+		fmt.Fprintf(&sql, " image=$%d", len(values)+1)
+		values = append(values, fmt.Sprintf("/profile/%s", update.ImageName))
+		//valuesAll = append(valuesAll, fmt.Sprintf("/profile/%s", &update.ImageName))
+	}
+	if update.Phone != "" {
+		if len(values) > 0 {
+			sql.WriteString(",")
+		}
+		fmt.Fprintf(&sql, " phone=$%d", len(values)+1)
+		values = append(values, update.Phone)
+		//valuesAll = append(valuesAll, &update.Phone)
+	}
+	if update.First_Name != "" || update.Last_Name != "" || update.Phone != "" || email != "" || update.ImageName != "" {
+		sql.WriteString(", updated_at= NOW() WHERE ")
+		fmt.Fprintf(&sql, "email='%s'", email)
+	}
+
+	sqlStr := sql.String()
+
+	return u.db.Exec(ctx, sqlStr, values...)
+}
+
 func (u UserRepository) GetHistory(ctx context.Context, id int) ([]model.History, error) {
 	sqlStr := `
 	SELECT
@@ -89,49 +134,4 @@ func (u UserRepository) GetHistory(ctx context.Context, id int) ([]model.History
 		histories = append(histories, history)
 	}
 	return histories, nil
-}
-
-func (u UserRepository) UpdateProfile(ctx context.Context, update dto.UpdateProfile, email string) (pgconn.CommandTag, error) {
-	var sql strings.Builder
-	values := []any{}
-	//valuesAll := []any{}
-
-	sql.WriteString("UPDATE users SET")
-	if update.First_Name != "" {
-		fmt.Fprintf(&sql, " first_name=$%d", len(values)+1)
-		values = append(values, update.First_Name)
-		//valuesAll = append(valuesAll, &update.First_Name)
-	}
-	if update.Last_Name != "" {
-		if len(values) > 0 {
-			sql.WriteString(",")
-		}
-		fmt.Fprintf(&sql, " last_name=$%d", len(values)+1)
-		values = append(values, update.Last_Name)
-		//valuesAll = append(valuesAll, &update.Last_Name)
-	}
-	if update.ImageName != "" {
-		if len(values) > 0 {
-			sql.WriteString(",")
-		}
-		fmt.Fprintf(&sql, " image=$%d", len(values)+1)
-		values = append(values, fmt.Sprintf("/profile/%s", update.ImageName))
-		//valuesAll = append(valuesAll, fmt.Sprintf("/profile/%s", &update.ImageName))
-	}
-	if update.Phone != "" {
-		if len(values) > 0 {
-			sql.WriteString(",")
-		}
-		fmt.Fprintf(&sql, " phone=$%d", len(values)+1)
-		values = append(values, update.Phone)
-		//valuesAll = append(valuesAll, &update.Phone)
-	}
-	if update.First_Name != "" || update.Last_Name != "" || update.Phone != "" || email != "" || update.ImageName != "" {
-		sql.WriteString(", updated_at= NOW() WHERE ")
-		fmt.Fprintf(&sql, "email='%s'", email)
-	}
-
-	sqlStr := sql.String()
-
-	return u.db.Exec(ctx, sqlStr, values...)
 }

@@ -34,7 +34,7 @@ func NewAdminController(adminService *service.AdminService) *AdminController {
 // @Produce      json
 // @Success      200  {object}  dto.Movies
 // @Failure 		 500 {object} dto.ResponseError
-// @Router       /admin/movies/ [get]
+// @Router       /admin/movies [get]
 // @security 		 BearerAuth
 func (m AdminController) GetAllMovies(c *gin.Context) {
 	data, err := m.adminService.GetAllMovies(c.Request.Context())
@@ -76,7 +76,7 @@ func (m AdminController) GetAllMovies(c *gin.Context) {
 // @Failure 		 403 {object} dto.ResponseError
 // @Failure 		 404 {object} dto.ResponseError
 // @Failure 		 500 {object} dto.ResponseError
-// @Router       /admin/movies/ [post]
+// @Router       /admin/movies [post]
 // @Security			BearerAuth
 func (a AdminController) PostMovie(c *gin.Context) {
 	const maxSize = 2 * 1024 * 1024
@@ -310,5 +310,82 @@ func (a AdminController) DeleteMovie(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"msg":  "Deleted Successfully",
 		"data": data,
+	})
+}
+
+// UpdateStatus godoc
+//
+//	@Summary	Update status
+//	@Tags		admin
+//	@Accept		json
+//	@Produce	json
+//	@Param		orders	body		dto.UpdateStatusOrder	true	"Update status order [pending, done, cancelled]"
+//	@Success	200		{object}	dto.Response
+//	@Failure	401		{object}	dto.ResponseError
+//	@Failure	400		{object}	dto.ResponseError
+//	@Failure	404		{object}	dto.ResponseError
+//	@Failure	422		{object}	dto.ResponseError
+//	@Failure	500		{object}	dto.ResponseError
+//	@Router		/admin/orders [patch]
+//	@security	BearerAuth
+func (a AdminController) UpdateStatusOrder(c *gin.Context) {
+	var updtStatus dto.UpdateStatusOrder
+
+	_, isExist := c.Get("token")
+	if !isExist {
+		c.JSON(http.StatusForbidden, dto.ResponseError{
+			Msg:     "Forbidden Access",
+			Success: false,
+			Error:   "unauthorized",
+		})
+		return
+	}
+
+	if err := c.ShouldBindJSON(&updtStatus); err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, dto.ResponseError{
+			Msg:     "Internal Server Error",
+			Success: false,
+			Error:   "internal server error",
+		})
+		return
+	}
+
+	if err := a.adminService.UpdateStatusByOrderId(c.Request.Context(), updtStatus); err != nil {
+		str := err.Error()
+		if str == "status is not valid" {
+			c.JSON(http.StatusUnprocessableEntity, dto.ResponseError{
+				Msg:     "Status Is Not Appropriate",
+				Success: false,
+				Error:   "status is not appropriate",
+			})
+			return
+		}
+		if strings.Contains(str, "empty") {
+			c.JSON(http.StatusBadRequest, dto.ResponseError{
+				Msg:     "Invalid Body",
+				Success: false,
+				Error:   "invalid body",
+			})
+			return
+		}
+		if err.Error() == "no rows in result set" || err.Error() == "no data deleted" {
+			c.JSON(http.StatusNotFound, dto.ResponseError{
+				Msg:     "Data Not Found",
+				Success: false,
+				Error:   "data not found",
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, dto.ResponseError{
+			Msg:     "Internal Server Error",
+			Success: false,
+			Error:   "internal server error",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, dto.Response{
+		Msg:     "Status Order Updated Successfully",
+		Success: false,
 	})
 }

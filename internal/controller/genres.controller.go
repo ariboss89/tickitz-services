@@ -24,7 +24,7 @@ func NewGenreController(genreService *service.GenreService) *GenreController {
 // @Produce      json
 // @Success      200  {object}  dto.Genres
 // @Failure 		 500 {object} dto.ResponseError
-// @Router       /genres/ [get]
+// @Router       /genres [get]
 func (m GenreController) GetAllGenres(c *gin.Context) {
 	data, err := m.genreService.GetAllGenres(c.Request.Context())
 	if err != nil {
